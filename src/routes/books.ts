@@ -1,63 +1,116 @@
 import { Router } from "express";
+import { DbConnection } from "../middlewares/db-connection";
+import EsquemaBook from "../models/book";
 
 interface Book {
     id: number,
     titulo: string,
-    num_paginas: string,
+    num_paginas: number,
     isbn: string,
     editora: string
 }
 
+interface BookOnDB extends Book {
+    _id: string
+}
+
 const bookRoutes = Router();
 
-const books: Book[] = [];
+bookRoutes.get("/", DbConnection, async (_, res) => {
+    try {
+        const books: BookOnDB[] = await EsquemaBook.find();
 
-bookRoutes.get("/", (_, res) => {
-    res.json(books);
+        res.json(books);
+        
+    } catch (error) {
+        console.error(error);
+    }
 });
 
-bookRoutes.get("/:id", (req, res) => {
+bookRoutes.get("/:id", DbConnection, async (req, res) => {
     const { id } = req.params;
+    
+    try {
+        const book = await EsquemaBook.findOne({id: parseInt(id)});
+        
+        res.json(book);
+    } catch (error) {
+        console.error(error);
 
-    const book = books.find(book => {
-        return Number(id) === book.id;
-    })
+        res.json({
+            message: "Error: we cann't find book!"
+        })
+    }
 
-    res.json(book);
 });
 
-bookRoutes.post("/", (req, res) => {
+bookRoutes.post("/", DbConnection, async (req, res) => {
     const newBook = {...req.body};
 
-    books.push(newBook);
+    try {
+        const respostaDB: any = await EsquemaBook.create(newBook);
 
-    res.json(newBook);
+        res.json(respostaDB);
+        
+    } catch (error) {
+        console.error(error);
+        
+        res.json({
+            data: { 
+                message: "Error on creating book!"
+            }
+        });
+    }
 });
 
-bookRoutes.put("/:id", (req, res) => {
+bookRoutes.put("/:id", DbConnection, async (req, res) => {
     const { id } = req.params;
     const { body } = req;
+    
+    try {
+        await EsquemaBook.findOneAndUpdate(
+            {id: parseInt(id)}, 
+            {...body}
+        )
 
-    const bookRemovedIndex = books.findIndex(book => {
-        return book.id == Number(id)
-    });
+        res.json({
+            data: { 
+                message: "The book has been successfully updated!"
+            }
+        });
+        
+    } catch (error) {
+        console.error(error);
 
-    books[bookRemovedIndex] = { ...body };
-
-    res.json(books);
-
+        res.json({
+            data: { 
+                message: "Error on update this book!"
+            }
+        });
+    }
 });
 
-bookRoutes.delete("/:id", (req, res) => {
-    const { id } = req.params;
+bookRoutes.delete("/:id", DbConnection, async (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const bookRemovedIndex = books.findIndex(book => {
-        return book.id === Number(id)
-    });
+        await EsquemaBook.findOneAndDelete({id: parseInt(id)});
 
-    books.splice(bookRemovedIndex, 1)
+        res.json({
+            data: { 
+                message: "The book has been successfully removed!"
+            }
+        });
+        
+    } catch (error) {
+        console.error(error)
 
-    res.json(books);
+        res.json({
+            data: {
+                messagem: "Error on removing book"
+            }
+        })
+    }
 });
  
 export default bookRoutes;
