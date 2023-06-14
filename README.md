@@ -24,6 +24,7 @@ atualização e deleção de livros de uma livraria online fictícia.
 ## Tecnologias utilizadas
 
 - [NodeJs](https://nodejs.org)
+- [ExpressJs](https://expressjs.com)
 - [Typescript](https://www.typescriptlang.org/docs/)
 - [MongoDB](https://www.mongodb.com)
 - [Mongoose](https://mongoosejs.com/)
