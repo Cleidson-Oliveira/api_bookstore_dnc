@@ -11,6 +11,13 @@ const port = process.env.PORT || "3000";
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+    res.send(`
+        <p>Routes:</p><br/>
+        <a href="/livros">All books</a>
+    `)
+})
+
 app.use("/livros", bookRoutes);
 
 app.listen(port, () => {
