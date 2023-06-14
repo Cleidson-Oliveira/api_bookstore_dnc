@@ -1,4 +1,4 @@
-# API bookstore dnc
+# API bookstore DNC
 Desafio proposto na formação em tecnologia da Escola DNC. </br>
 A aplicação consiste em um CRUD para criação, busca, </br>
 atualização e deleção de livros de uma livraria online fictícia.
